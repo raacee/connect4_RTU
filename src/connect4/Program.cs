@@ -1,2 +1,20 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using System;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        string asciiArt = "\t\t▄▄▄▄▄▄▄ ▄▄▄▄▄▄▄ ▄▄    ▄ ▄▄    ▄ ▄▄▄▄▄▄▄ ▄▄▄▄▄▄▄ ▄▄▄▄▄▄▄    ▄   ▄▄▄ " + '\n' +
+                          "\t\t█       █       █  █  █ █  █  █ █       █       █       █  █ █ █   █" + '\n' +
+                          "\t\t█       █   ▄   █   █▄█ █   █▄█ █    ▄▄▄█       █▄     ▄█  █ █▄█   █" + '\n' +
+                          "\t\t█     ▄▄█  █ █  █       █       █   █▄▄▄█     ▄▄█ █   █    █       █" + '\n' +
+                          "\t\t█    █  █  █▄█  █  ▄    █  ▄    █    ▄▄▄█    █    █   █    █▄▄▄    █" + '\n' +
+                          "\t\t█    █▄▄█       █ █ █   █ █ █   █   █▄▄▄█    █▄▄  █   █        █   █" + '\n' +
+                          "\t\t█▄▄▄▄▄▄▄█▄▄▄▄▄▄▄█▄█  █▄▄█▄█  █▄▄█▄▄▄▄▄▄▄█▄▄▄▄▄▄▄█ █▄▄▄█        █▄▄▄█";
+        
+
+        
+
+        System.Console.WriteLine(asciiArt);
+    }
+}

@@ -160,6 +160,11 @@ class GameTree
             return true;
         }
 
+        public StateNode GetChild(int column)
+        {
+            return this.Children[column-1];
+        }
+
     }
 }
 

@@ -2,7 +2,7 @@
 
 static class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
         string title = "\n\t\t\t\t\t\t\t\t\t\t\t\t  \n" +
                        "\t\t▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄  ▄▄    ▄▄  ▄▄    ▄▄  ▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄   ▄   ▄▄▄  " + "\t\t  \n" +
@@ -31,6 +31,16 @@ static class Program
         Dictionary<int, ConsoleColor> playerColorsDict = new Dictionary<int, ConsoleColor>();
         playerColorsDict.Add(1,ConsoleColor.DarkYellow);
         playerColorsDict.Add(-1,ConsoleColor.DarkRed);
+        var selectCursors = new string[7]
+        {
+            "   ^                                       ",
+            "         ^                                 ",
+            "               ^                           ",
+            "                     ^                     ",
+            "                           ^               ",
+            "                                 ^         ",
+            "                                       ^   "
+        };
         
         Console.Clear();
 
@@ -39,34 +49,48 @@ static class Program
             case "1":
                 Grid grid = new Grid();
                 Token? winnerToken = null;
-                while (true)
+                while (winnerToken == null)
                 {
                     playerEntry:
                     Console.ForegroundColor = ConsoleColor.Gray;
                     grid.DisplayGrid();
-                    Console.WriteLine("Press a key to select a column to insert a token");
-                    string? key = Console.ReadLine();
 
-                    int columnNumber = 0;
-                    bool parseSuccessful = int.TryParse(key, out columnNumber);
-                    columnNumber--;
-
-                    if (!parseSuccessful || columnNumber >= grid.Tokens.GetLength(1) || columnNumber < 0)
+                    int cursorPosition = 0;
+                    Console.WriteLine(selectCursors[cursorPosition]);
+                    
+                    
+                    Console.WriteLine("Press an arrow key to select a column to insert a token");
+                    Console.WriteLine("Or press Return/Enter to insert a token");
+                    while (true)
                     {
-                        Console.ResetColor();
-                        Console.Clear();
-                        Console.BackgroundColor = ConsoleColor.Black;
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Error, invalid number entered");
-                        Console.WriteLine("Press a key to continue");
-                        Console.ReadLine();
-                        Console.Clear();
-                        goto playerEntry;
+                        var key = Console.ReadKey();
+                        if (key.Key == ConsoleKey.LeftArrow && cursorPosition > 0)
+                        {
+                            cursorPosition--;
+                            Console.Clear();
+                            grid.DisplayGrid();
+                            Console.WriteLine(selectCursors[cursorPosition]);
+                            Console.WriteLine("Press an arrow key to select a column to insert a token");
+                            Console.WriteLine("Or press Return/Enter to insert a token");
+                        }
+                        else if (key.Key == ConsoleKey.RightArrow && cursorPosition < 6)
+                        {
+                            cursorPosition++;
+                            Console.Clear();
+                            grid.DisplayGrid();
+                            Console.WriteLine(selectCursors[cursorPosition]);
+                            Console.WriteLine("Press an arrow key to select a column to insert a token");
+                            Console.WriteLine("Or press Return/Enter to insert a token");
+                        }
+                        else if (key.Key == ConsoleKey.Enter)
+                        {
+                            break;
+                        }
                     }
-
+                    
                     try
                     {
-                        winnerToken = grid.InsertToken(columnNumber, new Token(playerColorsDict[player]));
+                        winnerToken = grid.InsertToken(cursorPosition, new Token(playerColorsDict[player]));
                     }
                     catch (Exception e)
                     {
@@ -80,9 +104,13 @@ static class Program
                         Console.Clear();
                         goto playerEntry;
                     }
+                    
+                    Console.Clear();
+                    grid.DisplayGrid();
 
                     if (winnerToken != null)
                     {
+                        Console.ForegroundColor = winnerToken.Color;
                         Console.WriteLine(winnerToken.Color.ToString() + " Wins !");
                         Console.WriteLine("Press a key to go main menu");
                         Console.ReadLine();
@@ -91,8 +119,9 @@ static class Program
                     }
 
                     player *= -1;
-                    Console.Clear();
+                    
                 }
+                break;
 
             case "2":
                 Console.ResetColor();
@@ -188,52 +217,52 @@ public class Grid
             if (i + k < this._tokens.GetLength(0) && this._tokens[i, j]?.Color == this._tokens[i + k, j]?.Color)
             {
                 counterRight++;
-                if (counterRight == 4 || counterRight + counterLeft == 5) return this._tokens[i,j];
+                if (counterRight == 4 || counterRight + counterLeft == 5) return this._tokens[i, j];
             }
 
             if (j + k < this._tokens.GetLength(1) && this._tokens[i, j]?.Color == this._tokens[i, j + k]?.Color)
             {
                 counterTop++;
-                if (counterTop == 4 || counterTop + counterBottom == 5) return this._tokens[i,j];
+                if (counterTop == 4 || counterTop + counterBottom == 5) return this._tokens[i, j];
             }
 
             if (i - k >= 0 && this._tokens[i, j]?.Color == this._tokens[i - k, j]?.Color)
             {
                 counterLeft++;
-                if (counterLeft == 4 || counterRight + counterLeft == 5) return this._tokens[i,j];
+                if (counterLeft == 4 || counterRight + counterLeft == 5) return this._tokens[i, j];
             }
 
             if (j - k >= 0 && this._tokens[i, j]?.Color == this._tokens[i, j - k]?.Color)
             {
                 counterBottom++;
-                if (counterBottom == 4 || counterTop + counterBottom == 5) return this._tokens[i,j];
+                if (counterBottom == 4 || counterTop + counterBottom == 5) return this._tokens[i, j];
             }
 
             if (i + k < this._tokens.GetLength(0) && j + k < this._tokens.GetLength(1) &&
                 this._tokens[i, j]?.Color == this._tokens[i + k, j + k]?.Color)
             {
                 counterTopRight++;
-                if (counterTopRight == 4 || counterTopRight + counterBottomLeft == 5) return this._tokens[i,j];
+                if (counterTopRight == 4 || counterTopRight + counterBottomLeft == 5) return this._tokens[i, j];
             }
 
             if (j - k >= 0 && i + k < this._tokens.GetLength(0) &&
                 this._tokens[i, j]?.Color == this._tokens[i + k, j - k]?.Color)
             {
                 counterBottomRight++;
-                if (counterBottomRight == 4 || counterBottomRight + counterTopLeft == 5) return this._tokens[i,j];
+                if (counterBottomRight == 4 || counterBottomRight + counterTopLeft == 5) return this._tokens[i, j];
             }
 
             if (j - k >= 0 && i - k >= 0 && this._tokens[i, j]?.Color == this._tokens[i - k, j - k]?.Color)
             {
                 counterBottomLeft++;
-                if (counterBottomLeft == 4 || counterTopRight + counterBottomLeft == 5) return this._tokens[i,j];
+                if (counterBottomLeft == 4 || counterTopRight + counterBottomLeft == 5) return this._tokens[i, j];
             }
 
             if (i - k >= 0 && j + k < this._tokens.GetLength(1) &&
                 this._tokens[i, j]?.Color == this._tokens[i - k, j + k]?.Color)
             {
                 counterTopLeft++;
-                if (counterTopLeft == 4 || counterBottomRight + counterTopLeft == 5) return this._tokens[i,j];
+                if (counterTopLeft == 4 || counterBottomRight + counterTopLeft == 5) return this._tokens[i, j];
             }
         }
 
@@ -246,7 +275,7 @@ public class Grid
         {
             for (int j = 0; j < this._tokens.GetLength(1); j++)
             {
-                if (this._tokens[i,j] == null)
+                if (this._tokens[i, j] == null)
                 {
                     return false;
                 }
@@ -300,9 +329,7 @@ public class Grid
                 Console.WriteLine("╝");
             }
         }
-        
-       
-            
+
         Console.Write("|  1  ");
         for (int n = 2; n <= 7; n++)
         {

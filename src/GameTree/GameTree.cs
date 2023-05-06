@@ -1,4 +1,6 @@
-namespace connect4;
+using GameComponents;
+
+namespace GameTree;
 
 class GameTree
 {
@@ -8,9 +10,10 @@ class GameTree
     {
         this._root = new StateNode(new Grid());
         this.GenerateAllGameStates(this._root);
+        this.Minimax(this._root);
     }
 
-    private StateNode Root
+    public StateNode Root
     {
         get { return _root; }
     }
@@ -37,99 +40,135 @@ class GameTree
         }
     }
     
-    public void Minimax(StateNode currentStateNode) {
+    public int Minimax(StateNode currentStateNode) {
         // defining whether to use the heuristic evaluation function
 
         //equivalent to "if useHeuristic parameter is true then use heuristic evaluation function ;
         // else just evaluate the numberOfSticks of a child node
-        const evaluationFunction = (StateNode stateNode) => stateNode.playerTurn === 0 ? -1 : 1;
+        Func<StateNode, int> evaluationFunction = delegate(StateNode stateNode)
+        {
+            var winnerToken = stateNode.Grid.WinnerToken();
+            if (winnerToken == null) return 0;
+            if (winnerToken.Color == ConsoleColor.DarkYellow) return 1;
+            if (winnerToken.Color == ConsoleColor.DarkRed) return -1;
+            return 0;
+        };
 
 
         // Base case: If the game is over (no sticks left)
         // or if the bottom node is reached in case of partially available tree
-        if (currentStateNode.isLeaf()) {
-            return evaluationFunction(currentStateNode)
+        if (currentStateNode.IsLeaf())
+        {
+            return evaluationFunction(currentStateNode);
         }
 
         // Maximizing player
-        if (currentStateNode.playerTurn === 0) {
-            let maxEval = -Infinity;
-            for (const childNode of currentStateNode.childStateNodes) {
-                if (!childNode.evaluation) {
-                    childNode.evaluation = this.minimax(childNode, useHeuristic)
+        if (currentStateNode.Player == 1) {
+            int maxEval = int.MinValue;
+            foreach (var childNode in currentStateNode.Children) {
+                if (childNode.Evaluation == null)
+                {
+                    childNode.Evaluation.Value = this.Minimax(childNode);
                 }
-                maxEval = Math.max(maxEval, childNode.evaluation);
+                maxEval = Math.Max(maxEval, childNode.Evaluation.Value);
             }
-            currentStateNode.evaluation = maxEval
+            currentStateNode.Evaluation.Value = maxEval;
             return maxEval;
         } else { // Minimizing player
-            let minEval = Infinity;
-            for (const childNode of currentStateNode.childStateNodes) {
-                if (!childNode.evaluation) {
-                    childNode.evaluation = this.minimax(childNode, useHeuristic)
+            var minEval = int.MaxValue;
+            foreach (var childNode in currentStateNode.Children) {
+                if (childNode.Evaluation == null)
+                {
+                    childNode.Evaluation.Value = this.Minimax(childNode);
                 }
-                minEval = Math.min(minEval, childNode.evaluation);
+                minEval = Math.Min(minEval, childNode.Evaluation.Value);
             }
-            currentStateNode.evaluation = minEval
+            currentStateNode.Evaluation.Value = minEval;
             return minEval;
         }
     
     
 }
 
-public class StateNode
-{
-    private Grid _grid;
-    private List<StateNode> _children;
-    private int _player;
+    public class StateNode
+    {
+        private Grid _grid;
+        private List<StateNode> _children;
+        private int _player;
+        public NodeEvaluation Evaluation;
 
-    private readonly Dictionary<int, ConsoleColor> _playerDict = new Dictionary<int, ConsoleColor>(
-        new KeyValuePair<int, ConsoleColor>[]
-        {
-            new KeyValuePair<int, ConsoleColor>(1, ConsoleColor.DarkYellow),
-            new KeyValuePair<int, ConsoleColor>(-1, ConsoleColor.DarkRed)
-        });
+        public int Player => _player;
 
-    public StateNode(Grid grid)
-    {
-        this._grid = grid;
-        this._children = new List<StateNode>(0);
-        this._player = this._grid.TokenCount() % 2 == 0? 1 : -1;
-    }
-    
-    public Grid Grid
-    {
-        get { return _grid; }
-    }
-    public List<StateNode> Children
-    {
-        get { return _children; }
-    }
 
-    public void PopulateChildren()
-    {
-        if(!this._grid.IsFull())
-        {
-            for (int i = 0; i < _grid.Tokens.GetLength(1); i++)
+        private readonly Dictionary<int, ConsoleColor> _playerDict = new Dictionary<int, ConsoleColor>(
+            new[]
             {
-                var gridCopy = _grid.Clone();
-                try
-                {
-                    _grid.InsertToken(i, new Token(_playerDict[this._player]));
-                }
-                catch (ArgumentException)
-                {
-                    continue;
-                }
+                new KeyValuePair<int, ConsoleColor>(1, ConsoleColor.DarkYellow),
+                new KeyValuePair<int, ConsoleColor>(-1, ConsoleColor.DarkRed)
+            });
 
-                _children.Add(new StateNode(gridCopy));
+        public StateNode(Grid grid)
+        {
+            this._grid = grid;
+            this._children = new List<StateNode>(0);
+            this._player = this._grid.TokenCount() % 2 == 0 ? 1 : -1;
+        }
+
+        public Grid Grid
+        {
+            get { return _grid; }
+        }
+
+        public List<StateNode> Children
+        {
+            get { return _children; }
+        }
+
+        public void PopulateChildren()
+        {
+            if (!this._grid.IsFull())
+            {
+                for (int i = 0; i < _grid.Tokens.GetLength(1); i++)
+                {
+                    var gridCopy = _grid.Clone();
+                    try
+                    {
+                        _grid.InsertToken(i, new Token(_playerDict[this._player]));
+                    }
+                    catch (ArgumentException)
+                    {
+                        continue;
+                    }
+
+                    _children.Add(new StateNode(gridCopy));
+                }
             }
         }
-    }
 
-    public bool IsLeaf()
+        public bool IsLeaf()
+        {
+            return this._grid.IsFull();
+        }
+
+        public bool SameStateAs(StateNode otherNode)
+        {
+            for (var i0 = 0; i0 < otherNode.Grid.Tokens.GetLength(0); i0++)
+            for (var i1 = 0; i1 < otherNode.Grid.Tokens.GetLength(1); i1++)
+            {
+                if (this._grid.Tokens[i0, i1] != otherNode.Grid.Tokens[i0, i1]) return false;
+            }
+            return true;
+        }
+
+    }
+}
+
+class NodeEvaluation
+{
+    public int Value;
+
+    public NodeEvaluation(int value)
     {
-        return this._grid.IsFull();
+        Value = value;
     }
-
 }

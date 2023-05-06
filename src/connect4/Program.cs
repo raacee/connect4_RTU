@@ -7,6 +7,7 @@ static class Program
     static void Main()
     {
         Console.Clear();
+        
         string title = "\n\t\t\t\t\t\t\t\t\t\t\t\t  \n" +
                        "\t\t▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄  ▄▄    ▄▄  ▄▄    ▄▄  ▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄   ▄   ▄▄▄  " + "\t\t  \n" +
                        "\t\t█      █ █       █  █  █  █ █ █  █  █ █ █      █ █       █ █      █  █ █ █   █" + "\t\t  \n" +
@@ -88,10 +89,26 @@ static class Program
                             Console.WriteLine("Press an arrow key to select a column to insert a token");
                             Console.WriteLine("Or press Return/Enter to insert a token");
                         }
+                        else if (key.Key == ConsoleKey.P)
+                        {
+                            Console.Clear();    
+                            Console.WriteLine("Game is paused. Press P to resume");
+                            while(true)
+                            {
+                                var resumeKey = Console.ReadKey();
+                                if (resumeKey.Key == ConsoleKey.P)
+                                {
+                                    Console.Clear();
+                                    goto playerEntry;
+                                }
+                            }
+                            
+                        }
                         else if (key.Key == ConsoleKey.Enter)
                         {
                             break;
                         }
+                        
                     }
                     
                     try

@@ -4,6 +4,7 @@ static class Program
 {
     static void Main()
     {
+        Console.Clear();
         string title = "\n\t\t\t\t\t\t\t\t\t\t\t\t  \n" +
                        "\t\t▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄  ▄▄    ▄▄  ▄▄    ▄▄  ▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄   ▄   ▄▄▄  " + "\t\t  \n" +
                        "\t\t█      █ █       █  █  █  █ █ █  █  █ █ █      █ █       █ █      █  █ █ █   █" + "\t\t  \n" +
@@ -51,7 +52,10 @@ static class Program
                 Token? winnerToken = null;
                 while (winnerToken == null)
                 {
+                    Console.Clear();
+                    
                     playerEntry:
+                    
                     Console.ForegroundColor = ConsoleColor.Gray;
                     grid.DisplayGrid();
 

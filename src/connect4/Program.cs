@@ -3,15 +3,15 @@
 static class Program
 {
     static void Main(string[] args)
-    { 
+    {
         string title = "\n\t\t\t\t\t\t\t\t\t\t\t\t  \n" +
-                     "\t\t▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄  ▄▄    ▄▄  ▄▄    ▄▄  ▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄   ▄   ▄▄▄  " + "\t\t  \n" +
-                     "\t\t█      █ █       █  █  █  █ █ █  █  █ █ █      █ █       █ █      █  █ █ █   █" + "\t\t  \n" +
-                     "\t\t█      █ █   ▄   █  █   █▄█ █ █   █▄█ █ █    ▄▄█ █       █ █▄    ▄█  █ █▄█   █" + "\t\t  \n" +
-                     "\t\t█     ▄▄ █  █ █  █  █       █ █       █ █   █▄▄▄ █     ▄▄█  █   █    █       █" + "\t\t  \n" +
-                     "\t\t█    █   █  █▄█  █  █  ▄    █ █  ▄    █ █    ▄▄█ █    █     █   █    █▄▄▄    █" + "\t\t  \n" +
-                     "\t\t█    █▄▄ █       █  █ █ █   █ █ █ █   █ █   █▄▄▄ █    █▄▄   █   █        █   █" + "\t\t  \n" +
-                     "\t\t█▄▄▄▄▄▄█ █▄▄▄▄▄▄▄█  █▄█  █▄▄█ █▄█  █▄▄█ █▄▄▄▄▄▄█ █▄▄▄▄▄▄▄█  █▄▄▄█        █▄▄▄█" + "\t\t  \n";
+                       "\t\t▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄  ▄▄    ▄▄  ▄▄    ▄▄  ▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄   ▄   ▄▄▄  " + "\t\t  \n" +
+                       "\t\t█      █ █       █  █  █  █ █ █  █  █ █ █      █ █       █ █      █  █ █ █   █" + "\t\t  \n" +
+                       "\t\t█      █ █   ▄   █  █   █▄█ █ █   █▄█ █ █    ▄▄█ █       █ █▄    ▄█  █ █▄█   █" + "\t\t  \n" +
+                       "\t\t█     ▄▄ █  █ █  █  █       █ █       █ █   █▄▄▄ █     ▄▄█  █   █    █       █" + "\t\t  \n" +
+                       "\t\t█    █   █  █▄█  █  █  ▄    █ █  ▄    █ █    ▄▄█ █    █     █   █    █▄▄▄    █" + "\t\t  \n" +
+                       "\t\t█    █▄▄ █       █  █ █ █   █ █ █ █   █ █   █▄▄▄ █    █▄▄   █   █        █   █" + "\t\t  \n" +
+                       "\t\t█▄▄▄▄▄▄█ █▄▄▄▄▄▄▄█  █▄█  █▄▄█ █▄█  █▄▄█ █▄▄▄▄▄▄█ █▄▄▄▄▄▄▄█  █▄▄▄█        █▄▄▄█" + "\t\t  \n";
                      
 
         gameStart:
@@ -115,7 +115,7 @@ static class Program
     }
 }
 
-class Grid
+public class Grid
 {
     private Token[,] _tokens;
 
@@ -129,12 +129,18 @@ class Grid
         this._tokens = new Token[6, 7];
     }
 
+    public Grid(Token[,] tokens)
+    {
+        this._tokens = tokens;
+    }
+
     public Token? InsertToken(int column, Token token)
     {
         if (this._tokens[0, column] != null)
         {
             throw new ArgumentException("This column is already full");
         }
+
         for (int i = this._tokens.GetLength(0) - 1; i >= 0; i--)
         {
             if (this._tokens[i, column] == null)
@@ -145,6 +151,24 @@ class Grid
         }
 
         return null;
+    }
+
+    public int TokenCount()
+    {
+        int tokens = 0;
+
+        for (int i = 0; i < this._tokens.GetLength(0); i++)
+        {
+            for (int j = 0; j < this._tokens.GetLength(1); j++)
+            {
+                if (this._tokens[i, j] != null)
+                {
+                    tokens++;
+                }
+            }
+        }
+
+        return tokens;
     }
 
     private Token? CheckWin(int i, int j)
@@ -216,6 +240,22 @@ class Grid
         return null;
     }
 
+    public bool IsFull()
+    {
+        for (int i = 0; i < this._tokens.GetLength(0); i++)
+        {
+            for (int j = 0; j < this._tokens.GetLength(1); j++)
+            {
+                if (this._tokens[i,j] == null)
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     public void DisplayGrid(){
     {
         Console.Write("╔═════");
@@ -270,9 +310,23 @@ class Grid
         }
         Console.WriteLine("|");
     }}
+
+    public Grid Clone()
+    {
+        var newTokens = new Token[_tokens.GetLength(0), _tokens.GetLength(1)];
+        for (int i = 0; i < _tokens.GetLength(0); i++)
+        {
+            for (int j = 0; j < _tokens.GetLength(1); j++)
+            {
+                newTokens[i, j] = _tokens[i, j];
+            }
+        }
+
+        return new Grid(newTokens);
+    }
 }
 
-class Token
+public class Token
 {
     readonly ConsoleColor _color;
 

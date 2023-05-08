@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GameComponents\GameComponents.csproj" />
+    <ProjectReference Include="..\GameTree\GameTree.csproj" />
   </ItemGroup>
 
 </Project>

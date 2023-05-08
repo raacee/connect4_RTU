@@ -57,6 +57,63 @@
         }
       }
     },
+    "/home/racel/RiderProjects/connect4_RTU/src/GameTree/GameTree.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/racel/RiderProjects/connect4_RTU/src/GameTree/GameTree.csproj",
+        "projectName": "GameTree",
+        "projectPath": "/home/racel/RiderProjects/connect4_RTU/src/GameTree/GameTree.csproj",
+        "packagesPath": "/home/racel/.nuget/packages/",
+        "outputPath": "/home/racel/RiderProjects/connect4_RTU/src/GameTree/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/racel/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {
+              "/home/racel/RiderProjects/connect4_RTU/src/GameComponents/GameComponents.csproj": {
+                "projectPath": "/home/racel/RiderProjects/connect4_RTU/src/GameComponents/GameComponents.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/home/racel/.dotnet/sdk/7.0.201/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
     "/home/racel/RiderProjects/connect4_RTU/src/connect4/connect4.csproj": {
       "version": "1.0.0",
       "restore": {
@@ -81,6 +138,9 @@
             "projectReferences": {
               "/home/racel/RiderProjects/connect4_RTU/src/GameComponents/GameComponents.csproj": {
                 "projectPath": "/home/racel/RiderProjects/connect4_RTU/src/GameComponents/GameComponents.csproj"
+              },
+              "/home/racel/RiderProjects/connect4_RTU/src/GameTree/GameTree.csproj": {
+                "projectPath": "/home/racel/RiderProjects/connect4_RTU/src/GameTree/GameTree.csproj"
               }
             }
           }

@@ -11,6 +11,19 @@
         "runtime": {
           "bin/placeholder/GameComponents.dll": {}
         }
+      },
+      "GameTree/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v7.0",
+        "dependencies": {
+          "GameComponents": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/GameTree.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/GameTree.dll": {}
+        }
       }
     }
   },
@@ -19,11 +32,17 @@
       "type": "project",
       "path": "../GameComponents/GameComponents.csproj",
       "msbuildProject": "../GameComponents/GameComponents.csproj"
+    },
+    "GameTree/1.0.0": {
+      "type": "project",
+      "path": "../GameTree/GameTree.csproj",
+      "msbuildProject": "../GameTree/GameTree.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net7.0": [
-      "GameComponents >= 1.0.0"
+      "GameComponents >= 1.0.0",
+      "GameTree >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -53,6 +72,9 @@
           "projectReferences": {
             "/home/racel/RiderProjects/connect4_RTU/src/GameComponents/GameComponents.csproj": {
               "projectPath": "/home/racel/RiderProjects/connect4_RTU/src/GameComponents/GameComponents.csproj"
+            },
+            "/home/racel/RiderProjects/connect4_RTU/src/GameTree/GameTree.csproj": {
+              "projectPath": "/home/racel/RiderProjects/connect4_RTU/src/GameTree/GameTree.csproj"
             }
           }
         }

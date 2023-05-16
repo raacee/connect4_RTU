@@ -20,7 +20,7 @@ static class Program
                        "\t\t█▄▄▄▄▄▄█ █▄▄▄▄▄▄▄█ █▄█  █▄▄█ █▄█  █▄▄█ █▄▄▄▄▄▄█ █▄▄▄▄▄▄▄█   █▄▄▄█      █▄▄▄█" + "\t\t  \n";
         
         string playerSelectStr =
-            "    Enter 1 to play locally against an other player\tEnter 2 to play against the computer\t  ";
+            "    Enter 1 to play locally against an other player\tEnter 2 to play against the computer\n\n\t\t\t\t\tEnter Q to leave the game ";
 
         gameStart:
         
@@ -28,7 +28,7 @@ static class Program
         Console.WriteLine(title);
         Console.WriteLine("\t"+playerSelectStr);
 
-        string? playerSelectInput = Console.ReadLine();
+        var playerSelectInput = Console.ReadKey();
 
         int player = 1;
         Dictionary<int, ConsoleColor> playerColorsDict = new Dictionary<int, ConsoleColor>();
@@ -48,9 +48,9 @@ static class Program
         
         Console.Clear();
 
-        switch (playerSelectInput)
+        switch (playerSelectInput.Key)
         {
-            case "1":
+            case ConsoleKey.D1:
                 Grid grid = new Grid();
                 Token? winnerToken = null;
                 while (winnerToken == null && !grid.IsFull())
@@ -92,7 +92,7 @@ static class Program
                         else if (key.Key == ConsoleKey.P)
                         {
                             Console.Clear();    
-                            Console.WriteLine("Game is paused. Press P to resume");
+                            Console.WriteLine("Game is paused. Press P to resume. Press Q to go to main menu.");
                             while(true)
                             {
                                 var resumeKey = Console.ReadKey();
@@ -100,6 +100,11 @@ static class Program
                                 {
                                     Console.Clear();
                                     goto playerEntry;
+                                }
+                                else if (resumeKey.Key == ConsoleKey.Q)
+                                {
+                                    Console.Clear();
+                                    goto gameStart;
                                 }
                             }
                             
@@ -156,7 +161,7 @@ static class Program
                 }
                 break;
 
-            case "2":
+            case ConsoleKey.D2:
                 Grid cpuGrid = new Grid();
                 GameTree.GameTree gt = new GameTree.GameTree(cpuGrid);
                 StateNode? currentNode = gt.Root;
@@ -289,6 +294,9 @@ static class Program
                     
                 }
                 break;
+            
+            case ConsoleKey.Q:
+                return;
             
             default:
                 Console.ResetColor();

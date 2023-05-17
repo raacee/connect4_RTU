@@ -2,9 +2,9 @@
     
 public class Grid
 {
-    private Token[,] _tokens;
+    private Token?[,] _tokens;
 
-    public Token[,] Tokens
+    public Token?[,] Tokens
     {
         get { return this._tokens; }
     }
@@ -14,7 +14,7 @@ public class Grid
         this._tokens = new Token[6, 7];
     }
 
-    public Grid(Token[,] tokens)
+    public Grid(Token?[,] tokens)
     {
         this._tokens = tokens;
     }
@@ -178,7 +178,7 @@ public class Grid
                 }
                 else
                 {
-                    this._tokens[i, j].Print(); 
+                    this._tokens[i, j]?.Print(); 
                 }
                 Console.Write("  ");
             }
@@ -213,12 +213,12 @@ public class Grid
 
     public Grid Clone()
     {
-        var newTokens = new Token[_tokens.GetLength(0), _tokens.GetLength(1)];
+        var newTokens = new Token?[_tokens.GetLength(0), _tokens.GetLength(1)];
         for (int i = 0; i < _tokens.GetLength(0); i++)
         {
             for (int j = 0; j < _tokens.GetLength(1); j++)
             {
-                newTokens[i, j] = new Token(_tokens[i, j].Color);
+                newTokens[i, j] = _tokens[i, j];
             }
         }
 
@@ -235,7 +235,7 @@ public class Grid
                 
                 if(otherGrid.Tokens[i, j] != null && this._tokens[i, j] != null)
                 {
-                    if (otherGrid.Tokens[i, j].Color != this._tokens[i, j].Color) return false;
+                    if (otherGrid.Tokens[i, j]?.Color != this._tokens[i, j]?.Color) return false;
                 }
             }
         }

@@ -52,7 +52,108 @@ public class GameTree
         {
             return 0;
         }
-        return NearTokensCount(stateNode);
+        return ScoreGrid(stateNode.Grid);
+    }
+
+    private int ScoreGrid(Grid grid)
+    {
+        int totalScore = 0;
+        int rows = grid.Tokens.GetLength(0);
+        int cols = grid.Tokens.GetLength(1);
+
+        // Check horizontal windows
+        for (int row = 0; row < rows; row++)
+        {
+            for (int col = 0; col < cols - 3; col++)
+            {
+                List<Token?> window = new List<Token?>();
+                for (int i = 0; i < 4; i++)
+                {
+                    window.Add(grid.Tokens[row, col + i]);
+                }
+                totalScore += ScoreWindow(window);
+            }
+        }
+
+        // Check vertical windows
+        for (int row = 0; row < rows - 3; row++)
+        {
+            for (int col = 0; col < cols; col++)
+            {
+                List<Token?> window = new List<Token?>();
+                for (int i = 0; i < 4; i++)
+                {
+                    window.Add(grid.Tokens[row + i, col]);
+                }
+                totalScore += ScoreWindow(window);
+            }
+        }
+
+        // Check diagonal windows (positive slope)
+        for (int row = 0; row < rows - 3; row++)
+        {
+            for (int col = 0; col < cols - 3; col++)
+            {
+                List<Token?> window = new List<Token?>();
+                for (int i = 0; i < 4; i++)
+                {
+                    window.Add(grid.Tokens[row + i, col + i]);
+                }
+                totalScore += ScoreWindow(window);
+            }
+        }
+
+        // Check diagonal windows (negative slope)
+        for (int row = 3; row < rows; row++)
+        {
+            for (int col = 0; col < cols - 3; col++)
+            {
+                List<Token?> window = new List<Token?>();
+                for (int i = 0; i < 4; i++)
+                {
+                    window.Add(grid.Tokens[row - i, col + i]);
+                }
+                totalScore += ScoreWindow(window);
+            }
+        }
+
+        return totalScore;
+    }
+
+    private int ScoreWindow(List<Token?> window)
+    {
+        int score = 0;
+        int aiPiecesCount = window.Count(token => token != null && token.Color == ConsoleColor.DarkYellow);
+        int playerPiecesCount = window.Count(token => token != null && token.Color == ConsoleColor.DarkRed);
+        int emptyCount = window.Count(token => token == null);
+
+        if (aiPiecesCount == 4)
+        {
+            score += 100;
+        }
+        else if (aiPiecesCount == 3 && emptyCount == 1)
+        {
+            score += 5;
+        }
+        else if (aiPiecesCount == 2 && emptyCount == 2)
+        {
+            score += 2;
+        }
+
+        if (playerPiecesCount == 4)
+        {
+            score -= 100;
+        }
+        else if (playerPiecesCount == 3 && emptyCount == 1)
+        {
+            score -= 5;
+        }
+        else if (playerPiecesCount == 2 && emptyCount == 2)
+        {
+            score -= 2;
+        }
+
+        return score;
     }
 
     private static int NearTokensCount(StateNode stateNode)

@@ -300,7 +300,7 @@ public class GameTree
 
     public StateNode? FindBestMove(StateNode node)
     {
-        StateNode bestMove = null;
+        StateNode? bestMove = null;
         bool playerIsCPU = node.Player == -1;
 
         if (playerIsCPU)
@@ -332,7 +332,7 @@ public class StateNode
     private Grid _grid;
     private List<StateNode> _children;
     private int _player;
-    private NodeEvaluation _evaluation;
+    private NodeEvaluation? _evaluation;
 
     public int Player => _player;
 
@@ -348,7 +348,7 @@ public class StateNode
 
     public List<StateNode> Children => _children;
 
-    public NodeEvaluation Evaluation
+    public NodeEvaluation? Evaluation
     {
         get => this._evaluation;
         set => this._evaluation = value;
@@ -359,7 +359,7 @@ public class StateNode
         this._grid = grid;
         this._children = new List<StateNode>(0);
         this._player = this._grid.TokenCount() % 2 == 0 ? 1 : -1;
-        this._evaluation = this._player == 1 ? new NodeEvaluation(int.MaxValue) : new NodeEvaluation(int.MinValue);
+        this._evaluation = null;
     }
 
     public void PopulateChildren()
@@ -393,14 +393,14 @@ public class StateNode
         return this.Grid.IsSameGridAs(otherNode.Grid);
     }
 
-    public StateNode GetChild(int column)
+    public StateNode? GetChild(int column)
     {
-        return this.Children[column-1];
+        return this._children[column-1];
     }
 
     public bool EndNode()
     {
-        return this.Grid.IsFull() || this.Grid.WinnerToken() != null;
+        return this._grid.IsFull() || this._grid.WinnerToken() != null;
     }
 
 }

@@ -23,7 +23,7 @@ public class Grid
     {
         if (this._tokens[0, column] != null)
         {
-            throw new ArgumentException("This column is already full");
+            throw new ArgumentException("Tried inserting a token in a full column");
         }
 
         for (int i = this._tokens.GetLength(0) - 1; i >= 0; i--)

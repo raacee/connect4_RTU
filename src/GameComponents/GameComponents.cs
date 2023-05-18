@@ -227,16 +227,20 @@ public class Grid
 
     public bool IsSameGridAs(Grid otherGrid)
     {
+        if (otherGrid.Tokens.GetLength(0) != this._tokens.GetLength(0) ||
+            otherGrid.Tokens.GetLength(1) != this._tokens.GetLength(0))
+        {
+            throw new Exception("The two grids have different dimensions");
+        }
         for (int i = 0; i < otherGrid.Tokens.GetLength(0); i++)
         {
             for (int j = 0; j < otherGrid.Tokens.GetLength(1); j++)
             {
                 if (otherGrid.Tokens[i, j] != null ^ this._tokens[i, j] != null) return false;
-                
-                if(otherGrid.Tokens[i, j] != null && this._tokens[i, j] != null)
-                {
-                    if (otherGrid.Tokens[i, j]?.Color != this._tokens[i, j]?.Color) return false;
-                }
+                if (otherGrid.Tokens[i, j] == null && this._tokens[i, j] == null) continue;
+                if (otherGrid.Tokens[i, j] == this._tokens[i, j]) continue;
+                if (otherGrid.Tokens[i, j]?.Color == this._tokens[i, j]?.Color) continue;
+                if (otherGrid.Tokens[i, j]?.Color != this._tokens[i, j]?.Color) return false;
             }
         }
         return true;

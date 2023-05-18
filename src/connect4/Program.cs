@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using GameComponents;
+﻿using GameComponents;
 using GameTree;
 
 namespace connect4;
@@ -164,7 +163,7 @@ static class Program
             case ConsoleKey.D2:
                 Grid cpuGrid = new Grid();
                 GameTree.GameTree gt = new GameTree.GameTree(cpuGrid);
-                StateNode? currentNode = gt.Root;
+                StateNode currentNode = gt.Root;
                 Token? winnerTokenCPU = null;
 
                 while (!cpuGrid.IsFull() && winnerTokenCPU == null)
@@ -235,12 +234,13 @@ static class Program
 
                     foreach (var childNode in currentNode.Children)
                     {
+                        if (childNode == null) continue;
                         if (childNode.SameStateAs(currentNode))
                         {
                             Console.WriteLine("SAME STATE CHILD FOUND");
                             currentNode = childNode;
                             if (!currentNode.EndNode() &&
-                                (currentNode.Children.Count == 0 || currentNode.Children == null))
+                                (currentNode.Children.Length == 0 || currentNode.Children == null))
                             {
                                 gt.GenerateAllGameStates(currentNode, 5);
                             }
@@ -261,7 +261,7 @@ static class Program
                     currentNode = bestNextNode;
 
                     if (!currentNode.EndNode() &&
-                        (currentNode.Children.Count == 0 || currentNode.Children == null))
+                        (currentNode.Children.Length == 0 || currentNode.Children == null))
                     {
                         gt.GenerateAllGameStates(currentNode, 5);
                     }

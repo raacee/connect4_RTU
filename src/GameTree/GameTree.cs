@@ -36,7 +36,10 @@ public class GameTree
         if (!stateNode.IsLeaf()) {
             foreach (var node in stateNode.Children)
             {
-                GenerateAllGameStates(node, maxDepth, depth + 1);
+                if(node != null)
+                {
+                    GenerateAllGameStates(node, maxDepth, depth + 1);
+                }
             }
         }
     }
@@ -232,7 +235,7 @@ public class GameTree
                     }
 
                     var sumForToken = 0;
-                    var counterArr = new int[]
+                    var counterArr = new[]
                     {
                         counterTop,
                         counterBottom,
@@ -274,18 +277,23 @@ public class GameTree
         if (currentStateNode.Player == 1)
         {
             int maxEval = int.MinValue;
-            foreach (var childNode in currentStateNode.Children) {
+            foreach (var childNode in currentStateNode.Children)
+            {
+                if (childNode == null) continue;
                 if (childNode.Evaluation == null)
                 {
                     childNode.Evaluation = new NodeEvaluation(this.Minimax(childNode));
                 }
+
                 maxEval = Math.Max(maxEval, childNode.Evaluation.Value);
             }
             currentStateNode.Evaluation = new NodeEvaluation(maxEval);
             return maxEval;
         } else { // Minimizing player
             var minEval = int.MaxValue;
-            foreach (var childNode in currentStateNode.Children) {
+            foreach (var childNode in currentStateNode.Children)
+            {
+                if (childNode == null) continue;
                 if (childNode.Evaluation == null)
                 {
                     childNode.Evaluation = new NodeEvaluation(this.Minimax(childNode));
@@ -300,37 +308,41 @@ public class GameTree
 
     public StateNode? FindBestMove(StateNode node)
     {
-        StateNode? bestMove = null;
-        bool playerIsCPU = node.Player == -1;
-
-        if (playerIsCPU)
+        if (!node.EndNode())
         {
-            // Minimizing player
-            var bestValue = int.MaxValue;
-            foreach (var childNode in node.Children)
+            StateNode? bestMove = null;
+            bool playerIsCPU = node.Player == -1;
+
+            if (playerIsCPU)
             {
-                if (childNode.Evaluation == null)
+                // Minimizing player
+                var bestValue = int.MaxValue;
+                foreach (var childNode in node.Children)
                 {
-                    childNode.Evaluation = new NodeEvaluation(this.Minimax(childNode));
+                    if(childNode == null) continue;
+                    if (childNode.Evaluation == null)
+                    {
+                        childNode.Evaluation = new NodeEvaluation(this.Minimax(childNode));
+                    }
+                    var evaluationValue = childNode.Evaluation.Value;
+                    if (evaluationValue <= bestValue)
+                    {
+                        bestValue = evaluationValue;
+                        bestMove = childNode;
+                    }
                 }
-                
-                var evaluationValue = childNode.Evaluation.Value;
-                if (evaluationValue <= bestValue)
-                {
-                    bestValue = evaluationValue;
-                    bestMove = childNode;
-                }
-                
             }
+            return bestMove;
+            
         }
-        return bestMove;
+        else return null;
     }
     
 }
 public class StateNode
 {
     private Grid _grid;
-    private List<StateNode> _children;
+    private StateNode?[] _children;
     private int _player;
     private NodeEvaluation? _evaluation;
 
@@ -346,7 +358,7 @@ public class StateNode
 
     public Grid Grid =>  _grid;
 
-    public List<StateNode> Children => _children;
+    public StateNode?[] Children => _children;
 
     public NodeEvaluation? Evaluation
     {
@@ -357,7 +369,7 @@ public class StateNode
     public StateNode(Grid grid)
     {
         this._grid = grid;
-        this._children = new List<StateNode>(0);
+        this._children = new StateNode?[7];
         this._player = this._grid.TokenCount() % 2 == 0 ? 1 : -1;
         this._evaluation = null;
     }
@@ -378,8 +390,12 @@ public class StateNode
                     continue;
                 }
 
-                _children.Add(new StateNode(gridCopy));
+                _children[i] = new StateNode(gridCopy);
             }
+        }
+        else
+        {
+            this._children = new StateNode?[7];
         }
     }
 

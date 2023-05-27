@@ -5,6 +5,25 @@ namespace connect4;
 
 static class Program
 {
+    private static readonly string[] SelectCursors = 
+    {
+        "   ^                                       ",
+        "         ^                                 ",
+        "               ^                           ",
+        "                     ^                     ",
+        "                           ^               ",
+        "                                 ^         ",
+        "                                       ^   "
+    };
+
+    private static void DisplayGridPlayer(Grid grid, int col)
+    {
+        grid.DisplayGrid();
+        Console.WriteLine(SelectCursors[col]);
+        Console.WriteLine("Press an arrow key to select a column to insert a token");
+        Console.WriteLine("Or press Return/Enter to insert a token");
+    }
+
     static void Main()
     {
         Console.Clear();
@@ -29,29 +48,16 @@ static class Program
 
         var playerSelectInput = Console.ReadKey();
 
-        int player = 1;
-        Dictionary<int, ConsoleColor> playerColorsDict = new Dictionary<int, ConsoleColor>();
-        playerColorsDict.Add(1,ConsoleColor.DarkYellow);
-        playerColorsDict.Add(-1,ConsoleColor.DarkRed);
-        
-        var selectCursors = new[]
-        {
-            "   ^                                       ",
-            "         ^                                 ",
-            "               ^                           ",
-            "                     ^                     ",
-            "                           ^               ",
-            "                                 ^         ",
-            "                                       ^   "
-        };
-        
         Console.Clear();
+        Console.ForegroundColor = ConsoleColor.Gray;
 
         switch (playerSelectInput.Key)
         {
             case ConsoleKey.D1:
                 Grid grid = new Grid();
                 Token? winnerToken = null;
+                int player = 1;
+                
                 while (winnerToken == null && !grid.IsFull())
                 {
                     Console.Clear();
@@ -62,7 +68,7 @@ static class Program
                     grid.DisplayGrid();
 
                     int cursorPosition = 0;
-                    Console.WriteLine(selectCursors[cursorPosition]);
+                    Console.WriteLine(SelectCursors[cursorPosition]);
                     
                     
                     Console.WriteLine("Press an arrow key to select a column to insert a token");
@@ -74,19 +80,13 @@ static class Program
                         {
                             cursorPosition--;
                             Console.Clear();
-                            grid.DisplayGrid();
-                            Console.WriteLine(selectCursors[cursorPosition]);
-                            Console.WriteLine("Press an arrow key to select a column to insert a token");
-                            Console.WriteLine("Or press Return/Enter to insert a token");
+                            DisplayGridPlayer(grid, cursorPosition);
                         }
                         else if (key.Key == ConsoleKey.RightArrow && cursorPosition < 6)
                         {
                             cursorPosition++;
                             Console.Clear();
-                            grid.DisplayGrid();
-                            Console.WriteLine(selectCursors[cursorPosition]);
-                            Console.WriteLine("Press an arrow key to select a column to insert a token");
-                            Console.WriteLine("Or press Return/Enter to insert a token");
+                            DisplayGridPlayer(grid, cursorPosition);
                         }
                         else if (key.Key == ConsoleKey.P)
                         {
@@ -117,21 +117,23 @@ static class Program
                     
                     try
                     {
-                        winnerToken = grid.InsertToken(cursorPosition, new Token(playerColorsDict[player]));
+                        var newTokenCoord = grid.InsertToken(cursorPosition, new Token(Grid.PlayerColorsDict[player]));
+                        winnerToken = grid.CheckWin(newTokenCoord[0], newTokenCoord[1]);
                     }
-                    catch (Exception e)
+                    catch (ArgumentException argumentException)
                     {
                         Console.ResetColor();
                         Console.Clear();
                         Console.BackgroundColor = ConsoleColor.Black;
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine(e.Message);
-                        Console.ReadLine();
+                        Console.WriteLine(argumentException.Message);
+                        Console.WriteLine("Press a key to retry");
+                        Console.ReadKey();
                         Console.ResetColor();
                         Console.Clear();
                         goto playerEntry;
                     }
-                    
+
                     Console.Clear();
                     grid.DisplayGrid();
 
@@ -161,48 +163,35 @@ static class Program
                 break;
 
             case ConsoleKey.D2:
-                Grid cpuGrid = new Grid();
-                GameTree.GameTree gt = new GameTree.GameTree(cpuGrid);
+                GameTree.GameTree gt = new GameTree.GameTree(new Grid());
                 StateNode currentNode = gt.Root;
-                Token? winnerTokenCPU = null;
+                Token? winnerTokenCpu = null;
 
-                while (!cpuGrid.IsFull() && winnerTokenCPU == null)
+                while (!currentNode.Grid.IsFull() && winnerTokenCpu == null)
                 {
-                    Console.Clear();
+                    playerSelect:
                     Console.ForegroundColor = ConsoleColor.Gray;
-                    cpuGrid.DisplayGrid();
-
-                    int cursorPosition = 0;
-                    Console.WriteLine(selectCursors[cursorPosition]);
-
-                    Console.WriteLine("Press an arrow key to select a column to insert a token");
-                    Console.WriteLine("Or press Return/Enter to insert a token");
                     
+                    Console.Clear();
+                    int cursorPosition = 0;
+                    DisplayGridPlayer(currentNode.Grid, cursorPosition);
+
+                    //Player choosing column
                     while (true)
                     {
                         var key = Console.ReadKey();
                         if (key.Key == ConsoleKey.LeftArrow && cursorPosition > 0)
                         {
                             cursorPosition--;
-                            Console.Clear();
-                            cpuGrid.DisplayGrid();
-                            Console.WriteLine(selectCursors[cursorPosition]);
-                            Console.WriteLine("Press an arrow key to select a column to insert a token");
-                            Console.WriteLine("Or press Return/Enter to insert a token");
                         }
                         else if (key.Key == ConsoleKey.RightArrow && cursorPosition < 6)
                         {
                             cursorPosition++;
-                            Console.Clear();
-                            cpuGrid.DisplayGrid();
-                            Console.WriteLine(selectCursors[cursorPosition]);
-                            Console.WriteLine("Press an arrow key to select a column to insert a token");
-                            Console.WriteLine("Or press Return/Enter to insert a token");
                         }
                         else if (key.Key == ConsoleKey.P)
                         {
                             Console.Clear();    
-                            Console.WriteLine("Game is paused. Press P to resume");
+                            Console.WriteLine("Game is paused. Press P to resume. Press Q to quit to main menu");
                             while(true)
                             {
                                 var resumeKey = Console.ReadKey();
@@ -211,6 +200,11 @@ static class Program
                                     Console.Clear();
                                     break;
                                 }
+                                else if (resumeKey.Key == ConsoleKey.Q)
+                                {
+                                    Console.Clear();
+                                    goto gameStart;
+                                }
                             }
                             
                         }
@@ -218,70 +212,89 @@ static class Program
                         {
                             break;
                         }
-                    }
-
-                    winnerTokenCPU = cpuGrid.InsertToken(cursorPosition,new Token(playerColorsDict[player]));
-                    
-                    if (winnerTokenCPU != null)
-                    {
-                        Console.ForegroundColor = winnerTokenCPU.Color;
-                        Console.WriteLine(winnerTokenCPU.Color + " Wins !");
-                        Console.WriteLine("Press a key to go main menu");
-                        Console.ReadLine();
                         Console.Clear();
-                        break;
+                        DisplayGridPlayer(currentNode.Grid, cursorPosition);
                     }
-
-                    foreach (var childNode in currentNode.Children)
+                    
+                    try
                     {
-                        if (childNode == null) continue;
-                        if (childNode.SameStateAs(currentNode))
+                        var newTokenCoord = currentNode.Grid.InsertToken(cursorPosition, new Token(Grid.PlayerColorsDict[currentNode.Player]));
+                        winnerTokenCpu = currentNode.Grid.CheckWin(newTokenCoord[0], newTokenCoord[1]);
+                        
+                        if (winnerTokenCpu != null)
                         {
-                            Console.WriteLine("SAME STATE CHILD FOUND");
-                            currentNode = childNode;
-                            if (!currentNode.EndNode() &&
-                                (currentNode.Children.Length == 0 || currentNode.Children == null))
-                            {
-                                gt.GenerateAllGameStates(currentNode, 5);
-                            }
-                            break;
+                            Console.Clear();
+                            currentNode.Grid.DisplayGrid();
+                            Console.ForegroundColor = winnerTokenCpu.Color;
+                            Console.WriteLine(winnerTokenCpu.Color + " Wins !");
+                            Console.WriteLine("Press a key to go main menu");
+                            Console.ReadKey();
+                            Console.Clear();
+                            goto gameStart;
                         }
+
+                        currentNode = currentNode.Children[cursorPosition];
                     }
                     
-                    cpuGrid = currentNode.Grid;
-                    Console.WriteLine("AFTER PLAYER TURN GRID IS :");
-                    cpuGrid.DisplayGrid();
-                    
-                    Thread.Sleep(1000);
-                    
-                    var bestNextNode = gt.FindBestMove(currentNode);
-                    
-                    Console.WriteLine(bestNextNode is null); // TODO : Writes True on first iteration
-                    
-                    currentNode = bestNextNode;
-
-                    if (!currentNode.EndNode() &&
-                        (currentNode.Children.Length == 0 || currentNode.Children == null))
+                    catch(ArgumentException argumentException)
                     {
-                        gt.GenerateAllGameStates(currentNode, 5);
+                        if (argumentException.Message == "Tried inserting a token in a full column")
+                        {
+                            Console.ResetColor();
+                            Console.Clear();
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine(argumentException.Message);
+                            Console.WriteLine("Press a key to retry");
+                            Console.ReadKey();
+                            Console.ResetColor();
+                            Console.Clear();
+                            
+                            goto playerSelect;
+                        }
+                        else throw;
                     }
                     
-                    cpuGrid = currentNode.Grid;
+                    currentNode.Grid.DisplayGrid();
 
-                    Console.WriteLine("AFTER CPU TURN GRID IS :");
-
-                    winnerTokenCPU = cpuGrid.WinnerToken();
-                    if (winnerTokenCPU != null)
+                    if (currentNode.IsLeaf() && !currentNode.IsEndNode())
                     {
-                        Console.ForegroundColor = winnerTokenCPU.Color;
-                        Console.WriteLine(winnerTokenCPU.Color.ToString() + " Wins !");
+                        StateNode.GenerateAllGameStates(currentNode, GameTree.GameTree.MaxDepth);
+                        GameTree.GameTree.Minimax(currentNode);
+                    }
+
+                    var bestMove = gt.FindBestMove(currentNode);
+
+                    if(bestMove != null)
+                    {
+                        currentNode = bestMove;
+                    }
+                    else
+                    {
+                        throw new SystemException("Best move is null.");
+                    }
+                    
+                    if (currentNode.IsLeaf() && !currentNode.IsEndNode())
+                    {
+                        StateNode.GenerateAllGameStates(currentNode, GameTree.GameTree.MaxDepth);
+                        GameTree.GameTree.Minimax(currentNode);
+                    }
+
+                    Console.WriteLine("CPU has played :");
+
+                    winnerTokenCpu = currentNode.Grid.WinnerToken();
+                    if (winnerTokenCpu != null)
+                    {
+                        currentNode.Grid.DisplayGrid();
+                        Console.ForegroundColor = winnerTokenCpu.Color;
+                        Console.WriteLine(winnerTokenCpu.Color.ToString() + " Wins !");
                         Console.WriteLine("Press a key to go main menu");
                         Console.ReadLine();
                         Console.Clear();
                         goto gameStart;
                     }
 
-                    if (cpuGrid.IsFull())
+                    if (currentNode.Grid.IsFull())
                     {
                         Console.ForegroundColor = ConsoleColor.Magenta;
                         Console.WriteLine("Game over, the grid is full ! The game is a draw");

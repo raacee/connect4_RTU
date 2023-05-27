@@ -2,51 +2,54 @@
     
 public class Grid
 {
-    private Token?[,] _tokens;
-
-    public Token?[,] Tokens
+    public const int Rows = 6;
+    public const int Columns = 7;
+    
+    public static Dictionary<int, ConsoleColor> PlayerColorsDict = new()
     {
-        get { return this._tokens; }
-    }
+        {1, ConsoleColor.DarkYellow},
+        {-1, ConsoleColor.DarkRed}
+    };
+
+    public Token?[,] Tokens { get; }
 
     public Grid()
     {
-        this._tokens = new Token[6, 7];
+        this.Tokens = new Token[Rows, Columns];
     }
 
-    public Grid(Token?[,] tokens)
+    private Grid(Token?[,] tokens)
     {
-        this._tokens = tokens;
+        this.Tokens = tokens;
     }
 
-    public Token? InsertToken(int column, Token token)
+    public int[] InsertToken(int column, Token token)
     {
-        if (this._tokens[0, column] != null)
+        if (this.Tokens[0, column] != null)
         {
             throw new ArgumentException("Tried inserting a token in a full column");
         }
 
-        for (int i = this._tokens.GetLength(0) - 1; i >= 0; i--)
+        for (int i = Rows - 1; i >= 0; i--)
         {
-            if (this._tokens[i, column] == null)
+            if (this.Tokens[i, column] == null)
             {
-                this._tokens[i, column] = token;
-                return this.CheckWin(i, column);
+                this.Tokens[i, column] = token;
+                return new[] {i, column};
             }
         }
-
-        return null;
+        return Array.Empty<int>();
     }
 
     public int TokenCount()
     {
         int tokens = 0;
 
-        for (int i = 0; i < this._tokens.GetLength(0); i++)
+        for (int i = 0; i < Rows; i++)
         {
-            for (int j = 0; j < this._tokens.GetLength(1); j++)
+            for (int j = 0; j < Columns; j++)
             {
-                if (this._tokens[i, j] != null)
+                if (this.Tokens[i, j] != null)
                 {
                     tokens++;
                 }
@@ -58,14 +61,14 @@ public class Grid
 
     public Token? WinnerToken()
     {
-        for (var i = 0; i < _tokens.GetLength(0); i++)
+        for (var i = 0; i < Rows; i++)
         {
-            for (var j = 0; j < _tokens.GetLength(1); j++)
+            for (var j = 0; j < Columns; j++)
             {
-                var token = _tokens[i, j];
+                var token = Tokens[i, j];
                 if (token != null)
                 {
-                    var winnerToken = CheckWin(i, j);
+                    var winnerToken = this.CheckWin(i, j);
                     if (winnerToken != null) return winnerToken;
                 }
             }
@@ -73,7 +76,7 @@ public class Grid
         return null;
     }
 
-    private Token? CheckWin(int i, int j)
+    public Token? CheckWin(int i, int j)
     {
         int counterTop = 0;
         int counterBottom = 0;
@@ -84,77 +87,84 @@ public class Grid
         int counterTopRight = 0;
         int counterBottomLeft = 0;
         int counterBottomRight = 0;
+        
+        // False if a counter have been interrupted
+        bool[] countersAbility = new bool[] {true, true, true, true, true, true, true, true};
 
-        for (int k = 0; k < 4; k++)
+        for (int k = 1; k <= 3; k++)
         {
-            if (i + k < this._tokens.GetLength(0) && this._tokens[i, j]?.Color == this._tokens[i + k, j]?.Color)
-            {
-                counterRight++;
-                if (counterRight == 4 || counterRight + counterLeft == 5) return this._tokens[i, j];
-            }
-
-            if (j + k < this._tokens.GetLength(1) && this._tokens[i, j]?.Color == this._tokens[i, j + k]?.Color)
-            {
-                counterTop++;
-                if (counterTop == 4 || counterTop + counterBottom == 5) return this._tokens[i, j];
-            }
-
-            if (i - k >= 0 && this._tokens[i, j]?.Color == this._tokens[i - k, j]?.Color)
-            {
-                counterLeft++;
-                if (counterLeft == 4 || counterRight + counterLeft == 5) return this._tokens[i, j];
-            }
-
-            if (j - k >= 0 && this._tokens[i, j]?.Color == this._tokens[i, j - k]?.Color)
+            if (i + k < Rows && this.Tokens[i, j]?.Color == this.Tokens[i + k, j]?.Color && countersAbility[0])
             {
                 counterBottom++;
-                if (counterBottom == 4 || counterTop + counterBottom == 5) return this._tokens[i, j];
+                if (counterBottom == 3 || counterTop + counterBottom == 3) return this.Tokens[i, j];
             }
+            else countersAbility[0] = false;
 
-            if (i + k < this._tokens.GetLength(0) && j + k < this._tokens.GetLength(1) &&
-                this._tokens[i, j]?.Color == this._tokens[i + k, j + k]?.Color)
+            if (j + k < Columns && this.Tokens[i, j]?.Color == this.Tokens[i, j + k]?.Color && countersAbility[1])
             {
-                counterTopRight++;
-                if (counterTopRight == 4 || counterTopRight + counterBottomLeft == 5) return this._tokens[i, j];
+                counterRight++;
+                if (counterRight == 3 || counterRight + counterLeft == 3) return this.Tokens[i, j];
             }
+            else countersAbility[1] = false;
 
-            if (j - k >= 0 && i + k < this._tokens.GetLength(0) &&
-                this._tokens[i, j]?.Color == this._tokens[i + k, j - k]?.Color)
+            if (i - k >= 0 && this.Tokens[i, j]?.Color == this.Tokens[i - k, j]?.Color && countersAbility[2])
+            {
+                counterTop++;
+                if (counterTop == 3 || counterTop + counterBottom == 3) return this.Tokens[i, j];
+            }
+            else countersAbility[2] = false;
+
+            if (j - k >= 0 && this.Tokens[i, j]?.Color == this.Tokens[i, j - k]?.Color && countersAbility[3])
+            {
+                counterLeft++;
+                if (counterLeft == 3 || counterLeft + counterRight == 3) return this.Tokens[i, j];
+            }
+            else countersAbility[3] = false;
+
+            if (i + k < Rows && j + k < Columns &&
+                this.Tokens[i, j]?.Color == this.Tokens[i + k, j + k]?.Color && countersAbility[4])
             {
                 counterBottomRight++;
-                if (counterBottomRight == 4 || counterBottomRight + counterTopLeft == 5) return this._tokens[i, j];
+                if (counterBottomRight == 3 || counterTopLeft + counterBottomRight == 3) return this.Tokens[i, j];
             }
+            else countersAbility[4] = false;
 
-            if (j - k >= 0 && i - k >= 0 && this._tokens[i, j]?.Color == this._tokens[i - k, j - k]?.Color)
+            if (j - k >= 0 && i + k < Rows &&
+                this.Tokens[i, j]?.Color == this.Tokens[i + k, j - k]?.Color && countersAbility[5])
             {
                 counterBottomLeft++;
-                if (counterBottomLeft == 4 || counterTopRight + counterBottomLeft == 5) return this._tokens[i, j];
+                if (counterBottomLeft == 3 || counterBottomLeft + counterTopRight == 3) return this.Tokens[i, j];
             }
+            else countersAbility[5] = false;
 
-            if (i - k >= 0 && j + k < this._tokens.GetLength(1) &&
-                this._tokens[i, j]?.Color == this._tokens[i - k, j + k]?.Color)
+            if (j - k >= 0 && i - k >= 0 && this.Tokens[i, j]?.Color == this.Tokens[i - k, j - k]?.Color &&
+                countersAbility[6])
             {
                 counterTopLeft++;
-                if (counterTopLeft == 4 || counterBottomRight + counterTopLeft == 5) return this._tokens[i, j];
+                if (counterTopLeft == 3 || counterTopLeft + counterBottomRight == 3) return this.Tokens[i, j];
             }
+            else countersAbility[6] = false;
+            
+            if (i - k >= 0 && j + k < Columns &&
+                this.Tokens[i, j]?.Color == this.Tokens[i - k, j + k]?.Color && countersAbility[7])
+            {
+                counterTopRight++;
+                if (counterTopRight == 3 || counterTopRight + counterBottomLeft == 3) return this.Tokens[i, j];
+            }
+            else countersAbility[7] = false;
         }
-
         return null;
     }
 
     public bool IsFull()
     {
-        for (int i = 0; i < this._tokens.GetLength(0); i++)
+        for (int j = 0; j < Columns; j++)
         {
-            for (int j = 0; j < this._tokens.GetLength(1); j++)
+            if (this.Tokens[0, j] == null)
             {
-                if (this._tokens[i, j] == null)
-                {
-                    return false;
-                }
+                return false;
             }
         }
-
         return true;
     }
 
@@ -167,18 +177,18 @@ public class Grid
         }
         Console.WriteLine("╗");
 
-        for (int i = 0; i < this._tokens.GetLength(0); i++)
+        for (int i = 0; i < Rows; i++)
         {
-            for (int j = 0; j < this._tokens.GetLength(1); j++)
+            for (int j = 0; j < Columns; j++)
             {
                 Console.Write("║  ");
-                if (this._tokens[i, j] == null)
+                if (this.Tokens[i, j] == null)
                 {
                     Console.Write(' ');
                 }
                 else
                 {
-                    this._tokens[i, j]?.Print(); 
+                    this.Tokens[i, j]?.Print(); 
                 }
                 Console.Write("  ");
             }
@@ -213,12 +223,12 @@ public class Grid
 
     public Grid Clone()
     {
-        var newTokens = new Token?[_tokens.GetLength(0), _tokens.GetLength(1)];
-        for (int i = 0; i < _tokens.GetLength(0); i++)
+        var newTokens = new Token?[Tokens.GetLength(0), Tokens.GetLength(1)];
+        for (int i = 0; i < Tokens.GetLength(0); i++)
         {
-            for (int j = 0; j < _tokens.GetLength(1); j++)
+            for (int j = 0; j < Tokens.GetLength(1); j++)
             {
-                newTokens[i, j] = _tokens[i, j];
+                newTokens[i, j] = Tokens[i, j];
             }
         }
 
@@ -227,8 +237,8 @@ public class Grid
 
     public bool IsSameGridAs(Grid otherGrid)
     {
-        if (otherGrid.Tokens.GetLength(0) != this._tokens.GetLength(0) ||
-            otherGrid.Tokens.GetLength(1) != this._tokens.GetLength(0))
+        if (otherGrid.Tokens.GetLength(0) != Rows ||
+            otherGrid.Tokens.GetLength(1) != Columns)
         {
             throw new Exception("The two grids have different dimensions");
         }
@@ -236,11 +246,11 @@ public class Grid
         {
             for (int j = 0; j < otherGrid.Tokens.GetLength(1); j++)
             {
-                if (otherGrid.Tokens[i, j] != null ^ this._tokens[i, j] != null) return false;
-                if (otherGrid.Tokens[i, j] == null && this._tokens[i, j] == null) continue;
-                if (otherGrid.Tokens[i, j] == this._tokens[i, j]) continue;
-                if (otherGrid.Tokens[i, j]?.Color == this._tokens[i, j]?.Color) continue;
-                if (otherGrid.Tokens[i, j]?.Color != this._tokens[i, j]?.Color) return false;
+                if (otherGrid.Tokens[i, j] != null ^ this.Tokens[i, j] != null) return false;
+                if (otherGrid.Tokens[i, j] == null && this.Tokens[i, j] == null) continue;
+                if (otherGrid.Tokens[i, j] == this.Tokens[i, j]) continue;
+                if (otherGrid.Tokens[i, j]?.Color == this.Tokens[i, j]?.Color) continue;
+                if (otherGrid.Tokens[i, j]?.Color != this.Tokens[i, j]?.Color) return false;
             }
         }
         return true;
@@ -249,22 +259,18 @@ public class Grid
 
 public class Token
 {
-    readonly ConsoleColor _color;
-
-    public ConsoleColor Color
-    {
-        get { return this._color; }
-    }
+    public ConsoleColor Color { get; }
 
     public Token(ConsoleColor color)
     {
-        _color = color;
+        Color = color;
     }
 
     public void Print()
     {
-        Console.ForegroundColor = _color;
+        var previousForegroundColor = Console.ForegroundColor;
+        Console.ForegroundColor = Color;
         Console.Write('⬤');
-        Console.ForegroundColor = ConsoleColor.Gray;
+        Console.ForegroundColor = previousForegroundColor;
     }
 }

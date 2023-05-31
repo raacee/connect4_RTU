@@ -31,7 +31,6 @@ public class GameTree
 
     private static int EvaluationFunction(StateNode stateNode)
     {
-        //TODO : implement function to analyze immediate threats
         var stateNodeWinner = stateNode.Grid.WinnerToken();
         if (stateNodeWinner != null)
         {
@@ -228,8 +227,9 @@ public class GameTree
         
     }
 
-    public StateNode? FindBestMove(StateNode stateNode)
+    public static StateNode? FindBestMove(StateNode stateNode)
     {
+        StateNode? threat = null; 
         StateNode? bestMove = null;
         if (!stateNode.IsEndNode())
         {

@@ -263,7 +263,7 @@ static class Program
                         GameTree.GameTree.Minimax(currentNode);
                     }
 
-                    var bestMove = gt.FindBestMove(currentNode);
+                    var bestMove = GameTree.GameTree.FindBestMove(currentNode);
 
                     if(bestMove != null)
                     {

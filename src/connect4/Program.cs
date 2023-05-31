@@ -318,7 +318,7 @@ static class Program
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Error, invalid number entered");
                 Console.WriteLine("Press a key to continue");
-                Console.ReadLine();
+                Console.ReadKey();
                 Console.ResetColor();
                 Console.Clear();
                 goto gameStart;

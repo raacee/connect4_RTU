@@ -260,9 +260,9 @@ static class Program
                     if (currentNode.IsLeaf() && !currentNode.IsEndNode())
                     {
                         StateNode.GenerateAllGameStates(currentNode, GameTree.GameTree.MaxDepth);
-                        GameTree.GameTree.Minimax(currentNode);
                     }
-
+                    
+                    GameTree.GameTree.Minimax(currentNode);
                     var bestMove = GameTree.GameTree.FindBestMove(currentNode);
 
                     if(bestMove != null)

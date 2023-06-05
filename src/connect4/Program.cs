@@ -165,9 +165,9 @@ static class Program
             case ConsoleKey.D2:
                 GameTree.GameTree gt = new GameTree.GameTree(new Grid());
                 StateNode currentNode = gt.Root;
-                Token? winnerTokenCpu = null;
+                winnerToken = null;
 
-                while (!currentNode.Grid.IsFull() && winnerTokenCpu == null)
+                while (!currentNode.Grid.IsFull() && winnerToken == null)
                 {
                     playerSelect:
                     Console.ForegroundColor = ConsoleColor.Gray;
@@ -219,14 +219,14 @@ static class Program
                     try
                     {
                         var newTokenCoord = currentNode.Grid.InsertToken(cursorPosition, new Token(Grid.PlayerColorsDict[currentNode.Player]));
-                        winnerTokenCpu = currentNode.Grid.CheckWin(newTokenCoord[0], newTokenCoord[1]);
+                        winnerToken = currentNode.Grid.CheckWin(newTokenCoord[0], newTokenCoord[1]);
                         
-                        if (winnerTokenCpu != null)
+                        if (winnerToken != null)
                         {
                             Console.Clear();
                             currentNode.Grid.DisplayGrid();
-                            Console.ForegroundColor = winnerTokenCpu.Color;
-                            Console.WriteLine(winnerTokenCpu.Color + " Wins !");
+                            Console.ForegroundColor = winnerToken.Color;
+                            Console.WriteLine(winnerToken.Color + " Wins !");
                             Console.WriteLine("Press a key to go main menu");
                             Console.ReadKey();
                             Console.Clear();
@@ -282,12 +282,12 @@ static class Program
 
                     Console.WriteLine("CPU has played :");
 
-                    winnerTokenCpu = currentNode.Grid.WinnerToken();
-                    if (winnerTokenCpu != null)
+                    winnerToken = currentNode.Grid.WinnerToken();
+                    if (winnerToken != null)
                     {
                         currentNode.Grid.DisplayGrid();
-                        Console.ForegroundColor = winnerTokenCpu.Color;
-                        Console.WriteLine(winnerTokenCpu.Color.ToString() + " Wins !");
+                        Console.ForegroundColor = winnerToken.Color;
+                        Console.WriteLine(winnerToken.Color.ToString() + " Wins !");
                         Console.WriteLine("Press a key to go main menu");
                         Console.ReadLine();
                         Console.Clear();

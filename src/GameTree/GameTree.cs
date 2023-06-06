@@ -41,7 +41,7 @@ public class GameTree
             return 0;
         }
         
-        Tuple<int, int, int, int> coeffs = new Tuple<int, int, int, int>(4, 2, 1, 100000);
+        Tuple<int, int, int> coeffs = new Tuple<int, int, int>(4, 2, 1);
         int centerControl = CenterControl(stateNode);
         int maxHeight = MaxHeight(stateNode);
         int nearTokensCount = NearTokensCount(stateNode);

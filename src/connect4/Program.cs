@@ -142,7 +142,7 @@ static class Program
                         Console.ForegroundColor = winnerToken.Color;
                         Console.WriteLine(winnerToken.Color.ToString() + " Wins !");
                         Console.WriteLine("Press a key to go main menu");
-                        Console.ReadLine();
+                        Console.ReadKey();
                         Console.Clear();
                         goto gameStart;
                     }
@@ -152,7 +152,7 @@ static class Program
                         Console.ForegroundColor = ConsoleColor.Magenta;
                         Console.WriteLine("Game over, the grid is full ! The game is a draw");
                         Console.WriteLine("Press a key to go main menu");
-                        Console.ReadLine();
+                        Console.ReadKey();
                         Console.Clear();
                         goto gameStart;
                     }
@@ -289,7 +289,7 @@ static class Program
                         Console.ForegroundColor = winnerToken.Color;
                         Console.WriteLine(winnerToken.Color.ToString() + " Wins !");
                         Console.WriteLine("Press a key to go main menu");
-                        Console.ReadLine();
+                        Console.ReadKey();
                         Console.Clear();
                         goto gameStart;
                     }
@@ -299,7 +299,7 @@ static class Program
                         Console.ForegroundColor = ConsoleColor.Magenta;
                         Console.WriteLine("Game over, the grid is full ! The game is a draw");
                         Console.WriteLine("Press a key to go main menu");
-                        Console.ReadLine();
+                        Console.ReadKey();
                         Console.Clear();
                         goto gameStart;
                     }
